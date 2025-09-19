@@ -98,8 +98,8 @@ export const quizHandler = async (req, res) => {
             return res.status(500).json({ error: "Server misconfiguration" });
         }
 
-        const { history, userDetail } = req.body;
-        if (!history || !userDetail) {
+        const { history, userDetail, resumeDetail } = req.body;
+        if (!history || !userDetail || !resumeDetail) {
             return res.status(400).json({ error: "Missing required data" });
         }
 
@@ -121,7 +121,9 @@ export const quizHandler = async (req, res) => {
         “When you face a challenge, do you prefer to ask for help or solve it on your own?”
         “Do you enjoy working in a structured environment or one that’s more flexible?”
         “What type of tasks keep you motivated and engaged?” 
-        User details: ${JSON.stringify(userDetail)}`;
+        User details: ${userDetail}
+        Users Resume detail: ${resumeDetail}
+        `;
 
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
