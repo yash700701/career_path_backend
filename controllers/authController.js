@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
 import crypto from "crypto";
-import sendEmail from "../utils/sendEmail.js";
+import { sendEmail } from "../utils/email.js";
 
 /**
  * @desc    Register a new user
@@ -39,9 +39,12 @@ export const register = async (req, res) => {
         const message = `Verify your email by clicking the link below:\n\n${verificationUrl}`;
 
         await sendEmail({
-            email: user.email,
+            to: user.email,
             subject: "Email Verification",
-            message,
+            html: `
+                <p>Hello ${user.name},</p>
+                <p>${message}</p>
+            `,
         });
 
         return res.status(201).json({
@@ -186,9 +189,12 @@ export const resetPassword = async (req, res) => {
         const message = `You requested a password reset. Please click on the link below to reset your password:\n\n${resetUrl}`;
 
         await sendEmail({
-            email: user.email,
+            to: user.email,
             subject: "Password Reset Request",
-            message,
+            html: `
+                <p>Hello ${user.name},</p>
+                <p>${message}</p>
+            `,
         });
 
         return res.json({ message: "Password reset email sent" });
