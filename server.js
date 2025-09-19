@@ -1,5 +1,4 @@
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -12,7 +11,10 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import careerRoutes from "./routes/careerRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 
-dotenv.config();
+if (process.env.NODE_ENV !== "production") {
+  const dotenv = await import("dotenv");
+  dotenv.config();
+}
 connectDB();
 
 const app = express();
