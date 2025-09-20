@@ -1,5 +1,5 @@
 import Quiz from "../models/Quiz.js";
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 /**
  * @desc    Initialize new quiz in DB
@@ -103,42 +103,47 @@ export const quizHandler = async (req, res) => {
             return res.status(400).json({ error: "Missing required data" });
         }
 
-        const ai = new GoogleGenAI(apiKey);
+        const genAI = new GoogleGenerativeAI(apiKey);
+        const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-        const instruction = `You are an AI assistant helping students discover the best career paths by asking personalized, personality-based questions. The student’s profile already includes detailed information extracted from their LinkedIn, resume, and other sources such as education, skills, experience, certifications, and interests.
-        Your task is to ask specific, short questions that help understand their personality, motivations, strengths, learning style, and preferences. These should complement the existing data and help create a complete picture that will later be used by another AI model to provide tailored career guidance and suggestions.
+        const instruction = `
+You are an AI assistant helping students discover the best career paths by asking personalized, personality-based questions. 
+The student’s profile already includes detailed information extracted from LinkedIn, resume, and other sources such as education, skills, experience, certifications, and interests.
 
-        Important rules:
-        # Use the provided history of chats to build context and ask follow-up questions naturally.
-        # Do not ask questions already covered in the user’s profile.
-        # Avoid long, open-ended questions—answers should be short, ideally one or two sentences.
-        # Questions should focus on personality traits like problem-solving, stress management, leadership, work preferences, motivation, values, and learning style.
-        # Keep the conversation friendly, empathetic, and encouraging.
-        # After each answer, wait for the user’s reply before asking the next question.
-        # Do not suggest career paths or advice yet—only gather more context to build the user’s profile.
+Your task:
+- Ask specific, short questions that help understand their personality, motivations, strengths, learning style, and preferences. 
+- Complement the existing data, avoid duplicates. 
+- Avoid long, open-ended questions (short answers, ideally one or two sentences).
+- Focus on traits like problem-solving, stress management, leadership, work preferences, motivation, values, and learning style.
+- Keep the tone friendly, empathetic, and encouraging.
+- Do NOT suggest career paths yet—only gather context.
+`;
 
-        Example:
-        “When you face a challenge, do you prefer to ask for help or solve it on your own?”
-        “Do you enjoy working in a structured environment or one that’s more flexible?”
-        “What type of tasks keep you motivated and engaged?” 
-        User details: ${userDetail}
-        Users Resume detail: ${resumeDetail}
-        `;
+        const response = await model.generateContent({
+            contents: [
+                ...history,
+                {
+                    role: "user",
+                    parts: [
+                        {
+                            text: `
+Please generate the next quiz question based on the following student profile:
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: history.concat({
-                role: "user",
-                parts: [{ text: "Please generate the next quiz question." }],
-            }),
-            config: {
-                systemInstruction: instruction,
-            },
+📌 User Profile:
+${JSON.stringify(userDetail, null, 2)}
+
+📌 Resume Extracted Data:
+${JSON.stringify(resumeDetail, null, 2)}
+              `,
+                        },
+                    ],
+                },
+            ],
+            systemInstruction: instruction,
         });
 
-        res.json({
-            text: response.text,
-        });
+        const text = response.response.text();
+        res.json({ text });
     } catch (error) {
         console.error("Error in /api/quiz-handler:", error);
         res.status(500).json({ error: "Failed to process request" });
