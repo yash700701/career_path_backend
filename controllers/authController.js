@@ -22,36 +22,37 @@ export const register = async (req, res) => {
             }
         }
 
-        user = await User.create({ name, email, password, isVerified: false });
+        user = await User.create({ name, email, password, isVerified: true });
 
-        const verificationToken = crypto.randomBytes(32).toString("hex");
-        const verificationTokenHash = crypto
-            .createHash("sha256")
-            .update(verificationToken)
-            .digest("hex");
+        // const verificationToken = crypto.randomBytes(32).toString("hex");
+        // const verificationTokenHash = crypto
+        //     .createHash("sha256")
+        //     .update(verificationToken)
+        //     .digest("hex");
 
-        user.emailVerificationToken = verificationTokenHash;
-        user.emailVerificationExpire = Date.now() + 60 * 60 * 1000; // 1 hour
+        // user.emailVerificationToken = verificationTokenHash;
+        // user.emailVerificationExpire = Date.now() + 60 * 60 * 1000; // 1 hour
 
         await user.save({ validateBeforeSave: false });
 
-        const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
-        const message = `Verify your email by clicking the link below:\n\n${verificationUrl}`;
+        // const verificationUrl = `${process.env.CLIENT_URL}/verify-email/${verificationToken}`;
+        // const message = `Verify your email by clicking the link below:\n\n${verificationUrl}`;
 
-        await sendEmail({
-            to: user.email,
-            subject: "Email Verification",
-            html: `
-                <p>Hello ${user.name},</p>
-                <p>${message}</p>
-            `,
-        });
+        // await sendEmail({
+        //     to: user.email,
+        //     subject: "Email Verification",
+        //     html: `
+        //         <p>Hello ${user.name},</p>
+        //         <p>${message}</p>
+        //     `,
+        // });
 
         return res.status(201).json({
             _id: user.id,
             name: user.name,
             email: user.email,
-            message: "Verification email sent. Please check your inbox.",
+            // message: "Verification email sent. Please check your inbox.",
+            message: "Register successfully, You can now login.",
         });
     } catch (error) {
         console.error("Register Error:", error);
