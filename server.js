@@ -9,6 +9,7 @@ import profileRoutes from "./routes/profileRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import careerRoutes from "./routes/careerRoutes.js";
+import chatRoutes from "./routes/chatRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 
 if (process.env.NODE_ENV !== "production") {
@@ -38,6 +39,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/quiz", quizRoutes);
 app.use("/api/upload", uploadRoutes);
 app.use("/api/career", careerRoutes);
+app.use("/api/chat", chatRoutes);
 app.use("/api/health", healthRoutes);
 
 // Define routes
