@@ -13,17 +13,36 @@ import chatRoutes from "./routes/chatRoutes.js";
 import healthRoutes from "./routes/healthRoutes.js";
 
 if (process.env.NODE_ENV !== "production") {
-  const dotenv = await import("dotenv");
-  dotenv.config();
+    const dotenv = await import("dotenv");
+    dotenv.config();
 }
+
 connectDB();
 
 const app = express();
 app.use(logger);
 
+//cors
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://career-path-gen-ai-exchange.vercel.app/",
+];
+
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
+        credentials: true,
+    })
+);
+
 // Middleware
 app.use(express.json());
-app.use(cors());
 app.use(helmet());
 app.use(
     "/api/",
