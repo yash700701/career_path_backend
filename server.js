@@ -23,23 +23,26 @@ const app = express();
 app.use(logger);
 
 //cors
-const allowedOrigins = [
-    "http://localhost:3000",
-    "https://career-path-gen-ai-exchange.vercel.app",
-];
+// const allowedOrigins = [
+//     "http://localhost:3000",
+//     "https://career-path-gen-ai-exchange.vercel.app",
+// ];
 
 app.use(
-    cors({
-        origin: (origin, callback) => {
-            if (!origin || allowedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS"));
-            }
-        },
-        credentials: true,
-    })
+    cors({})
 );
+// app.use(
+//     cors({
+//         origin: (origin, callback) => {
+//             if (!origin || allowedOrigins.includes(origin)) {
+//                 callback(null, true);
+//             } else {
+//                 callback(new Error("Not allowed by CORS"));
+//             }
+//         },
+//         credentials: true,
+//     })
+// );
 
 // Middleware
 app.use(express.json());
