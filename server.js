@@ -23,27 +23,22 @@ const app = express();
 app.use(logger);
 
 //cors
-// const allowedOrigins = [
-//     "http://localhost:3000",
-//     "https://career-path-gen-ai-exchange.vercel.app",
-// ];
-
-// app.use(
-//     cors({
-//         origin: (origin, callback) => {
-//             if (!origin || allowedOrigins.includes(origin)) {
-//                 callback(null, true);
-//             } else {
-//                 callback(new Error("Not allowed by CORS"));
-//             }
-//         },
-//         credentials: true,
-//     })
-// );
-
+const allowedOrigins = [
+    "http://localhost:3000",
+    "https://career-path-gen-ai-exchange.vercel.app",
+];
 
 app.use(
-    cors({})
+    cors({
+        origin: (origin, callback) => {
+            if (!origin || allowedOrigins.includes(origin)) {
+                callback(null, true);
+            } else {
+                callback(new Error("Not allowed by CORS"));
+            }
+        },
+        credentials: true,
+    })
 );
 
 // Middleware
@@ -77,7 +72,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: "Something went wrong!" });
 });
 
-const PORT = process.env.PORT_N || 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
